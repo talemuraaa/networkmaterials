@@ -1,6 +1,20 @@
 import streamlit as st
 from utils.image_loader import get_image_path
 
+def intro():
+    st.write("""
+             
+         ## 第一回（5月5日）
+         ### 0.作ったもの紹介
+         ### 1.BAモデル\n
+         ### 2.ランダムウォークモデル
+         
+         ずっとstreamlitを弄ってたので実験とかはできてないです。今回でstreamlitでの資料作りや実験を行う枠組みは作れたので次回以降からは楽できそう。
+         ページの公開は色々難しそうだったので今回はパス。
+         
+         """)
+    st.divider()
+
 def chapter1():
     st.title("優先的選択モデル")
 
@@ -46,18 +60,20 @@ def chapter1():
             st.write("")
         with col2:
             st.write("""
-                ステップ１.　新しいノード$i$が$G$に追加され、$ m\leq m_0 $個の新しいリンクが付与される。\n
-                ステップ２.　各リンクは古いノード$j$に確率
+                ステップ１. 新しいノード$i$が$G$に追加され、$ m\leq m_0 $個の新しいリンクが付与される。\n
+                ステップ２. 各リンクは古いノード$j$に確率
                      """)  
         st.latex(r'''
         \prod (i\leftrightarrow	j)=
-        \frac{k_j}{\sum_{l}(k_j)}
+        \frac{k_j}{\sum_{l}(k_l)}
         ''')
         col1, col2 = st.columns([1, 20])
         with col1:
             st.write("")
         with col2:
-            st.write("で接続される。式の分母は$i$を除く全てのノードの次数の和であり、全ての確率の和が$1$になることを示している。")
+            st.write("""
+                     で接続される。式の分母は$i$を除く全てのノードの次数の和であり、全ての確率の和が$1$になることを示している。
+                     """)
             
             st.write("この手順を目的のノード数$N$に達するまで繰り返す。")
 
@@ -104,8 +120,7 @@ def chapter1():
                      """)
             
     st.write("BAモデルは次数（次数中心性）に基づく優先的選択を行うが、別の中心性に基づいた優先的選択を行うモデルを考えても面白そう？")    
-            
-       
+           
 def chapter2():
     st.title("ランダムウォークモデル")
     st.write("（rwモデルと表記）")
@@ -124,7 +139,7 @@ def chapter2():
     
     with st.container(border=True):
         
-        st.header(" _定式化_　_random walk model_ ", divider=True)
+        st.header(" _定式化_ _random walk model_ ", divider=True)
         st.divider()
         st.write("""
             
@@ -142,9 +157,9 @@ def chapter2():
             st.write("")
         with col2:
             st.write("""
-                ステップ１.　新しいノード$i$が$G$に追加され、$ m\leq m_0 $個の新しいリンクが付与される。\n
-                ステップ２.　ノード$i$の最初のリンクはランダムに選ばれた古いノード$j$に接続される\n
-                ステップ３.　他の各リンクは確率$p$で、$j$の隣接ノードからランダムに接続され、確率$p-1$で、全体からランダムに選ばれた他のノードに接続される。
+                ステップ１. 新しいノード$i$が$G$に追加され、$ m\leq m_0 $個の新しいリンクが付与される。\n
+                ステップ２. ノード$i$の最初のリンクはランダムに選ばれた古いノード$j$に接続される\n
+                ステップ３. 他の各リンクは確率$p$で、$j$の隣接ノードからランダムに接続され、確率$p-1$で、全体からランダムに選ばれた他のノードに接続される。
                      """)  
 
         st.write("この手順を目的のノード数$N$に達するまで繰り返す。")            
@@ -218,7 +233,7 @@ def chapter2():
             
             """)
             
-        col1, col2 = st.columns([1, 20])
+        col1, col2 = st.columns([1, 30])
         with col1:
             st.write("")
         with col2:
@@ -227,7 +242,7 @@ def chapter2():
                 ステップ２.　ノード$i$の最初のリンクはランダムに選ばれた古いノード$j$に接続される\n
                      """)  
             
-            col3,col4= st.columns([1, 8])
+            col3,col4= st.columns([2, 9])
             with col3:
                 st.write("ステップ３.")
             with col4:
@@ -255,7 +270,7 @@ def chapter2():
              なぜか平均クラスター係数はpが0.8を超えると減少を始める。
              
              """)
-   
+
     
     with feature1:
         image_path = get_image_path("step_RW_hist.png")
@@ -263,7 +278,6 @@ def chapter2():
     
         image_path = get_image_path("step_RW_hist2.png")
         st.image(image_path)
-        
-        
+
     image_path = get_image_path("step_RW_deg_VIS.png")
     st.image(image_path)            

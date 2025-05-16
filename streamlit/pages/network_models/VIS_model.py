@@ -1,34 +1,11 @@
 import streamlit as st
 import networkx as nx
 import matplotlib.pyplot as plt
-import random as rd
-import numpy as np
-import pandas as pd
 
-from pages.n_model import models
-#データフレーム作成
+from pages.network_models import models
+from pages.network_models import VIS_components
 
-def net_parameter(G):
-    
-    def heterogeneity(G): 
-        d=list(dict(nx.degree(G)).values())
-        k1=sum(np.square(d))/G.number_of_nodes()
-        k2=(np.mean(d))**2
-        k3=k1/k2
-        return k3
-    
-    number_of_nodes=nx.number_of_nodes(G)
-    number_of_edges=nx.number_of_edges(G)
-    density=nx.density(G)
-    average_clustering=nx.average_clustering(G)
-    heterogeneity=heterogeneity(G)
-    
-    df=pd.DataFrame(
-        {"":[number_of_nodes,number_of_edges,density,average_clustering,heterogeneity] },
-         index=['ノード数','リンク数','リンク密度','クラスター係数','不均一性']
-        )
-    
-    st.dataframe(df)
+
 
 #モデル可視化
 
@@ -42,23 +19,26 @@ def random_network_page():
     st.code(code_R,language='python')
     st.caption("N:ノード数　p:接続確率")
     st.write("ｐの値が１に近付くと（ほぼ）完全グラフが生成され、処理に非常に時間がかかるので注意。")
-    with st.container(height=700,border=True):
+    G=None
+    with st.container(height=750,border=None):
         col1, col2 = st.columns([1, 3])
         with col1:
             N_value = st.slider("N_value", 10, 100, 40,step=10,key='R_slider1')
             p_value = st.slider("p_value", 0.0, 1.0, 0.3,key='R_slider2')
             vis_par=st.checkbox('特徴量',key='random')
             gene_random=st.button(label='生成',key='R',use_container_width=True)
-            
+               
         with col2:    
             if gene_random :
+
                 N=int(N_value)
                 p=float(p_value)
                 G = nx.gnp_random_graph(N,p)
+
                 pr1 = dict(nx.degree_centrality(G))
                 pos1 =nx.kamada_kawai_layout(G)
                 nx.draw_networkx_edges(G, pos1,edge_color='Gray')
-                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=130,edgecolors='Gray')
+                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
 
                 plt.axis('off')
                 plt.tight_layout()
@@ -66,8 +46,11 @@ def random_network_page():
                 st.pyplot(plt)
                 st.caption("次数が高いほどノードの色が濃く表現")
                 
-                if vis_par:
-                    net_parameter(G)
+                
+        if vis_par and gene_random:
+            VIS_components.net_parameter(G)
+    if G:                
+        VIS_components.downloud_adjacency_list_button(G)        
                        
 def WS_model_page():
     code_WS='nx.watts_strogatz_graph(N,p)'
@@ -75,9 +58,10 @@ def WS_model_page():
     st.code('import networkx as nx',language='python')
     st.code(code_WS,language='python')
     st.caption("N:ノード数　p:再配線確率")
-    with st.container(height=700,border=True):
+    with st.container(height=750,border=True):
         
         col1, col2 = st.columns([1, 3])
+        G=None
         with col1:
             
             N_value = st.slider("N_value", 10, 300, 40,step=10,key='WS_slider1')
@@ -85,7 +69,7 @@ def WS_model_page():
             p_value = st.slider("m_value", 0.0, 1.0, 0.3,key='WS_slider2')
             vis_par=st.checkbox('特徴量',key='WS_check')
             gene_ws = st.button(label='生成',key='WS',use_container_width=True)
-            
+                      
         with col2:    
             if gene_ws:
                 N=int(N_value)
@@ -95,18 +79,18 @@ def WS_model_page():
                 pr1 = dict(nx.degree_centrality(G))
                 pos1 =nx.spring_layout(G, k=0.4)
                 nx.draw_networkx_edges(G, pos1,edge_color='Gray')
-                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=130,edgecolors='Gray')
-                    
-
-                    
+                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
+                
                 plt.axis('off')
                 plt.tight_layout()
                 plt.suptitle(f"N={N} k={k} p={p} WS_model")
                 st.pyplot(plt)
                 st.caption("次数が高いほどノードの色が濃く表現")
                 
-                if vis_par:
-                    net_parameter(G)
+        if vis_par and gene_ws:
+            VIS_components.net_parameter(G)
+    if G:                
+        VIS_components.downloud_adjacency_list_button(G)                    
             
 def BA_model_page():
     code_BA='nx.barabasi_albert_graph(N,m)'
@@ -115,8 +99,8 @@ def BA_model_page():
     st.code(code_BA,language='python')
     st.caption("N:ノード数　m:新しいノードが接続されるリンク数")
     
-    with st.container(height=700,border=True):
-        
+    with st.container(height=750,border=True):
+        G=None
         col1, col2 = st.columns([1, 3])
         with col1:
             N_value = st.slider("N_value", 10, 300, 40,step=10,key='BA_slider1')
@@ -131,7 +115,7 @@ def BA_model_page():
                 pr1 = dict(nx.degree_centrality(G))
                 pos1 =nx.kamada_kawai_layout(G)
                 nx.draw_networkx_edges(G, pos1,edge_color='Gray')
-                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=130,edgecolors='Gray')
+                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
                  
 
                 
@@ -141,8 +125,10 @@ def BA_model_page():
                 st.pyplot(plt)
                 st.caption("次数が高いほどノードの色が濃く表現")   
                 
-                if vis_par:
-                    net_parameter(G)
+        if vis_par and gene_BA:
+            VIS_components.net_parameter(G)
+    if G:                
+        VIS_components.downloud_adjacency_list_button(G)                    
     
 def RW_page():
     st.write("""
@@ -187,9 +173,12 @@ def random_walk_graph(N,m,p):
                 selected.add(s)
     return G
         '''  
-            
-    with st.container(height=700,border=True):
+    with st.expander("実装コード"):
+        st.write("## _ランダムウォークモデル_")
+        st.code(code_RW,language='python')            
+    with st.container(height=750,border=True):
         col1, col2 = st.columns([1, 3])
+        G_RW=None
         with col1:
             N_RW_value = st.slider("N_value", 10, 300, 50,step=10,key='RW_slider1')
             m_RW_value = st.slider("m_value",1,10,3,key="RW_slider3")
@@ -205,7 +194,7 @@ def random_walk_graph(N,m,p):
                 pr_RW = dict(nx.degree_centrality(G_RW))
                 pos_RW =nx.spring_layout(G_RW, k=0.4) 
                 nx.draw_networkx_edges(G_RW, pos_RW,edge_color='Gray')
-                nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=130,edgecolors='Gray')                 
+                nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')                 
 
                 plt.axis('off')
                 plt.tight_layout()
@@ -213,12 +202,10 @@ def random_walk_graph(N,m,p):
                 st.pyplot(plt)
                 st.caption("次数が高いほどノードの色が濃く表現") 
                 
-                if vis_par:
-                    net_parameter(G_RW)   
-
-    with st.expander("実装コード"):
-        st.write("## _ランダムウォークモデル_")
-        st.code(code_RW,language='python')
+        if vis_par and gene_rw:
+            VIS_components.net_parameter(G_RW)   
+    if G_RW:                
+        VIS_components.downloud_adjacency_list_button(G_RW)  
 
 def step_RW_page():
     st.write("""
@@ -266,9 +253,13 @@ def step_RW_page():
             G.add_edge(i,s)        
     return G    
     '''
-
-    with st.container(height=700,border=True):
+    with st.expander("実装コード"):
+        st.write("## _ランダムウォークモデル(ver.2)_")
+        st.code(code,language="python")
+        
+    with st.container(height=750,border=True):
         col1, col2 = st.columns([1, 3])
+        G_RW=None
         with col1:
             N_value = st.slider("N_value", 10, 300, 50,step=10,key='SRW_slider1')
             p_value = st.slider("p_value", 0.0, 1.0, 0.5,key='SRW_slider2')
@@ -284,7 +275,7 @@ def step_RW_page():
                 pr_RW = dict(nx.degree_centrality(G_RW))
                 pos_RW =nx.spring_layout(G_RW, k=0.4) 
                 nx.draw_networkx_edges(G_RW, pos_RW,edge_color='Gray')
-                nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=100,edgecolors='Gray')
+                nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
                   
 
                 plt.axis('off')
@@ -293,9 +284,10 @@ def step_RW_page():
                 st.pyplot(plt)
                 st.caption("次数が高いほどノードの色が濃く表現") 
                 
-                if vis_par:
-                    net_parameter(G_RW)       
+        if vis_par and gene_srw:
+            VIS_components.net_parameter(G_RW)    
+    if G_RW:                
+        VIS_components.downloud_adjacency_list_button(G_RW)                  
     
-    with st.expander("実装コード"):
-        st.write("## _ランダムウォークモデル(ver.2)_")
-        st.code(code,language="python")
+
+

@@ -1,21 +1,14 @@
 import streamlit as st
-import networkx as nx
-import matplotlib.pyplot as plt
-import random as rd
 
-from pages.n_model import VIS_model
+from utils import sideber_title
+from pages.network_models import VIS_model
 
 st.set_page_config(
     page_title="ネットワーク保管庫"
     ,layout="centered"
 )
 
-with st.sidebar:
-    st.page_link("app.py",label="HOME",icon="🏠")
-    st.page_link("pages/MATERIALS.py",label="発表資料",icon="📖")
-    st.page_link("pages/programs.py",label="ネットワーク保管庫",icon="🔨")
-    st.page_link("pages/RECORD.py",label="アーカイブ",icon="📚")
-st.sidebar.divider()
+sideber_title.sideber_title()
 
 page = st.sidebar.selectbox(
     "モデルを選択",
@@ -27,9 +20,11 @@ page = st.sidebar.selectbox(
 st.title("🔨ネットワーク保管庫")
 st.write("""
          発表で利用したモデルやプログラムをここにまとめます。\n
-         - スライドバーで各パラメータを調整することができます。
-         - 「特徴量」に☑を入れると各種パラメータが同時に表示されます。
-         - ノード数が大きすぎるとmatplotlibが怒るので最大ノード数は300固定。\n
+         
+         - スライドバーで各パラメータを調整できます。
+         - 「特徴量」に☑を入れると特徴量が同時に表示されます。
+         - ノード数が大きくなると可視化されたネットワークがごちゃごちゃするので気休め程度に。
+         - downloadボタンを押すと生成したネットワークの隣接リストがcsvでダウンロードできます。
          """)
 st.divider()
 
