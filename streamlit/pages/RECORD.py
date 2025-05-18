@@ -1,5 +1,5 @@
 import streamlit as st
-from pages.page_modu import material_1
+from module.page_modu import material_1
 from utils import sideber_title
 
 st.set_page_config(

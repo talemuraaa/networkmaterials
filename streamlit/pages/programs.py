@@ -1,8 +1,8 @@
 import streamlit as st
 
 from utils import sideber_title
-from pages.network_models import VIS_model
-from pages.experiments.ex_hist import experiment_hist
+from module.network_models import VIS_model
+from module.experiments.ex_hist import experiment_hist
 
 def main_VIS_network():
     st.write("""

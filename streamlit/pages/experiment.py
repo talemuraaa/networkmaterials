@@ -1,6 +1,6 @@
 import streamlit as st
 from utils import sideber_title
-from pages.experiments.main_attack_net import attack_to_network
+from module.experiments.main_attack_net import attack_to_network
 
 
 sideber_title.sideber_title()
