@@ -3,9 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from pages.network_models import models
-from pages.network_models import VIS_components
-
-
+from pages.network_models.VIS_network import VIS_components,downloud_adjacency,VIS_hist
 
 #モデル可視化
 
@@ -20,14 +18,17 @@ def random_network_page():
     st.caption("N:ノード数　p:接続確率")
     st.write("ｐの値が１に近付くと（ほぼ）完全グラフが生成され、処理に非常に時間がかかるので注意。")
     G=None
-    with st.container(height=750,border=None):
+    
+    with st.container(border=True):
+
         col1, col2 = st.columns([1, 3])
         with col1:
             N_value = st.slider("N_value", 10, 100, 40,step=10,key='R_slider1')
             p_value = st.slider("p_value", 0.0, 1.0, 0.3,key='R_slider2')
-            vis_par=st.checkbox('特徴量',key='random')
+            vis_par=st.checkbox('特徴量',key='random_vis_par')
+            dig_hist=st.checkbox('次数分布',key='random_deg_hist')
             gene_random=st.button(label='生成',key='R',use_container_width=True)
-               
+                
         with col2:    
             if gene_random :
 
@@ -45,12 +46,14 @@ def random_network_page():
                 plt.suptitle(f"N={N} p={p} random_network_model")
                 st.pyplot(plt)
                 st.caption("次数が高いほどノードの色が濃く表現")
-                
-                
+            
+            
         if vis_par and gene_random:
             VIS_components.net_parameter(G)
+        if dig_hist and gene_random:
+            VIS_hist.visualization_hist(G)
     if G:                
-        VIS_components.downloud_adjacency_list_button(G)        
+        downloud_adjacency.downloud_adjacency_list_button(G)        
                        
 def WS_model_page():
     code_WS='nx.watts_strogatz_graph(N,p)'
@@ -58,39 +61,41 @@ def WS_model_page():
     st.code('import networkx as nx',language='python')
     st.code(code_WS,language='python')
     st.caption("N:ノード数　p:再配線確率")
-    with st.container(height=750,border=True):
+      
+    col1, col2 = st.columns([1, 3])
+    G=None
+    with col1:
         
-        col1, col2 = st.columns([1, 3])
-        G=None
-        with col1:
+        N_value = st.slider("N_value", 10, 300, 40,step=10,key='WS_slider1')
+        k_value = st.slider("K_value", 2, 10, 3,key='WS_slider3')
+        p_value = st.slider("m_value", 0.0, 1.0, 0.3,key='WS_slider2')
+        vis_par=st.checkbox('特徴量',key='WS_check')
+        dig_hist=st.checkbox('次数分布',key='ws_deg_hist')
+        gene_ws = st.button(label='生成',key='WS',use_container_width=True)
+                    
+    with col2:    
+        if gene_ws:
+            N=int(N_value)
+            k=int(k_value)
+            p=float(p_value)
+            G = nx.watts_strogatz_graph(N,k,p)
+            pr1 = dict(nx.degree_centrality(G))
+            pos1 =nx.spring_layout(G, k=0.4)
+            nx.draw_networkx_edges(G, pos1,edge_color='Gray')
+            nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
             
-            N_value = st.slider("N_value", 10, 300, 40,step=10,key='WS_slider1')
-            k_value = st.slider("K_value", 2, 10, 3,key='WS_slider3')
-            p_value = st.slider("m_value", 0.0, 1.0, 0.3,key='WS_slider2')
-            vis_par=st.checkbox('特徴量',key='WS_check')
-            gene_ws = st.button(label='生成',key='WS',use_container_width=True)
-                      
-        with col2:    
-            if gene_ws:
-                N=int(N_value)
-                k=int(k_value)
-                p=float(p_value)
-                G = nx.watts_strogatz_graph(N,k,p)
-                pr1 = dict(nx.degree_centrality(G))
-                pos1 =nx.spring_layout(G, k=0.4)
-                nx.draw_networkx_edges(G, pos1,edge_color='Gray')
-                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
-                
-                plt.axis('off')
-                plt.tight_layout()
-                plt.suptitle(f"N={N} k={k} p={p} WS_model")
-                st.pyplot(plt)
-                st.caption("次数が高いほどノードの色が濃く表現")
-                
-        if vis_par and gene_ws:
-            VIS_components.net_parameter(G)
+            plt.axis('off')
+            plt.tight_layout()
+            plt.suptitle(f"N={N} k={k} p={p} WS_model")
+            st.pyplot(plt)
+            st.caption("次数が高いほどノードの色が濃く表現")
+            
+    if vis_par and gene_ws:
+        VIS_components.net_parameter(G)
+    if dig_hist and gene_ws:
+        VIS_hist.visualization_hist(G)
     if G:                
-        VIS_components.downloud_adjacency_list_button(G)                    
+        downloud_adjacency.downloud_adjacency_list_button(G)                  
             
 def BA_model_page():
     code_BA='nx.barabasi_albert_graph(N,m)'
@@ -99,36 +104,36 @@ def BA_model_page():
     st.code(code_BA,language='python')
     st.caption("N:ノード数　m:新しいノードが接続されるリンク数")
     
-    with st.container(height=750,border=True):
-        G=None
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            N_value = st.slider("N_value", 10, 300, 40,step=10,key='BA_slider1')
-            m_value = st.slider("m_value", 1, 10, 3,key='BA_slider2')
-            vis_par=st.checkbox('特徴量',key='BA_check')
-            gene_BA=st.button(label='生成',key='BA',use_container_width=True)
-        with col2: 
-            if gene_BA:
-                N=int(N_value)
-                m=int(m_value)
-                G = nx.barabasi_albert_graph(N,m)
-                pr1 = dict(nx.degree_centrality(G))
-                pos1 =nx.kamada_kawai_layout(G)
-                nx.draw_networkx_edges(G, pos1,edge_color='Gray')
-                nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
-                 
-
-                
-                plt.axis('off')
-                plt.tight_layout()
-                plt.suptitle(f"N={N} m={m} BA_model")
-                st.pyplot(plt)
-                st.caption("次数が高いほどノードの色が濃く表現")   
-                
-        if vis_par and gene_BA:
-            VIS_components.net_parameter(G)
+        
+    col1, col2 = st.columns([1, 3])
+    G=None
+    with col1:
+        N_value = st.slider("N_value", 10, 300, 40,step=10,key='BA_slider1')
+        m_value = st.slider("m_value", 1, 10, 3,key='BA_slider2')
+        vis_par=st.checkbox('特徴量',key='BA_check')
+        dig_hist=st.checkbox('次数分布',key='ba_deg_hist')
+        gene_BA=st.button(label='生成',key='BA',use_container_width=True)
+    with col2: 
+        if gene_BA:
+            N=int(N_value)
+            m=int(m_value)
+            G = nx.barabasi_albert_graph(N,m)
+            pr1 = dict(nx.degree_centrality(G))
+            pos1 =nx.kamada_kawai_layout(G)
+            nx.draw_networkx_edges(G, pos1,edge_color='Gray')
+            nx.draw_networkx_nodes(G, pos1,node_color=list(pr1.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
+            plt.axis('off')
+            plt.tight_layout()
+            plt.suptitle(f"N={N} m={m} BA_model")
+            st.pyplot(plt)
+            st.caption("次数が高いほどノードの色が濃く表現")   
+            
+    if vis_par and gene_BA:
+        VIS_components.net_parameter(G)
+    if dig_hist and gene_BA:
+        VIS_hist.visualization_hist(G)
     if G:                
-        VIS_components.downloud_adjacency_list_button(G)                    
+        downloud_adjacency.downloud_adjacency_list_button(G)                   
     
 def RW_page():
     st.write("""
@@ -176,36 +181,39 @@ def random_walk_graph(N,m,p):
     with st.expander("実装コード"):
         st.write("## _ランダムウォークモデル_")
         st.code(code_RW,language='python')            
-    with st.container(height=750,border=True):
-        col1, col2 = st.columns([1, 3])
-        G_RW=None
-        with col1:
-            N_RW_value = st.slider("N_value", 10, 300, 50,step=10,key='RW_slider1')
-            m_RW_value = st.slider("m_value",1,10,3,key="RW_slider3")
-            p_RW_value = st.slider("p_value", 0.0, 1.0, 0.5,key='RW_slider2')
-            vis_par=st.checkbox('特徴量',key='rw')
-            gene_rw=st.button(label='生成',key=2,use_container_width=True)
-        with col2:          
-            if gene_rw:
-                N=int(N_RW_value)
-                m=int(m_RW_value)
-                p=float(p_RW_value)
-                G_RW = models.random_walk_graph(N,m,p)
-                pr_RW = dict(nx.degree_centrality(G_RW))
-                pos_RW =nx.spring_layout(G_RW, k=0.4) 
-                nx.draw_networkx_edges(G_RW, pos_RW,edge_color='Gray')
-                nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')                 
 
-                plt.axis('off')
-                plt.tight_layout()
-                plt.suptitle(f"N={N} p={p} random walk model")
-                st.pyplot(plt)
-                st.caption("次数が高いほどノードの色が濃く表現") 
-                
-        if vis_par and gene_rw:
-            VIS_components.net_parameter(G_RW)   
+    col1, col2 = st.columns([1, 3])
+    G_RW=None
+    with col1:
+        N_RW_value = st.slider("N_value", 10, 300, 50,step=10,key='RW_slider1')
+        m_RW_value = st.slider("m_value",1,10,3,key="RW_slider3")
+        p_RW_value = st.slider("p_value", 0.0, 1.0, 0.5,key='RW_slider2')
+        vis_par=st.checkbox('特徴量',key='rw')
+        dig_hist=st.checkbox('次数分布',key='rw_deg_hist')
+        gene_rw=st.button(label='生成',key=2,use_container_width=True)
+    with col2:          
+        if gene_rw:
+            N=int(N_RW_value)
+            m=int(m_RW_value)
+            p=float(p_RW_value)
+            G_RW = models.random_walk_graph(N,m,p)
+            pr_RW = dict(nx.degree_centrality(G_RW))
+            pos_RW =nx.spring_layout(G_RW, k=0.4) 
+            nx.draw_networkx_edges(G_RW, pos_RW,edge_color='Gray')
+            nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')                 
+
+            plt.axis('off')
+            plt.tight_layout()
+            plt.suptitle(f"N={N} p={p} random walk model")
+            st.pyplot(plt)
+            st.caption("次数が高いほどノードの色が濃く表現") 
+            
+    if vis_par and gene_rw:
+        VIS_components.net_parameter(G_RW)
+    if dig_hist and gene_rw:
+        VIS_hist.visualization_hist(G_RW)
     if G_RW:                
-        VIS_components.downloud_adjacency_list_button(G_RW)  
+        downloud_adjacency.downloud_adjacency_list_button(G_RW)   
 
 def step_RW_page():
     st.write("""
@@ -257,37 +265,39 @@ def step_RW_page():
         st.write("## _ランダムウォークモデル(ver.2)_")
         st.code(code,language="python")
         
-    with st.container(height=750,border=True):
-        col1, col2 = st.columns([1, 3])
-        G_RW=None
-        with col1:
-            N_value = st.slider("N_value", 10, 300, 50,step=10,key='SRW_slider1')
-            p_value = st.slider("p_value", 0.0, 1.0, 0.5,key='SRW_slider2')
-            l_value = st.slider("l_value", 1,50,3,key='SRW_slider3')
-            vis_par=st.checkbox('特徴量',key='srw')
-            gene_srw = st.button(label='生成',key=2,use_container_width=True)
-        with col2:          
-            if gene_srw:
-                N=int(N_value)
-                p=float(p_value)
-                l=int(l_value)
-                G_RW = models.step_RW_graph(N,p,l)
-                pr_RW = dict(nx.degree_centrality(G_RW))
-                pos_RW =nx.spring_layout(G_RW, k=0.4) 
-                nx.draw_networkx_edges(G_RW, pos_RW,edge_color='Gray')
-                nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
-                  
-
-                plt.axis('off')
-                plt.tight_layout()
-                plt.suptitle(f"N={N} m={p} l={l} step_random_walk")
-                st.pyplot(plt)
-                st.caption("次数が高いほどノードの色が濃く表現") 
+    col1, col2 = st.columns([1, 3])
+    G_RW=None
+    with col1:
+        N_value = st.slider("N_value", 10, 300, 50,step=10,key='SRW_slider1')
+        p_value = st.slider("p_value", 0.0, 1.0, 0.5,key='SRW_slider2')
+        l_value = st.slider("l_value", 1,50,3,key='SRW_slider3')
+        vis_par=st.checkbox('特徴量',key='srw')
+        dig_hist=st.checkbox('次数分布',key='sws_deg_hist')
+        gene_srw = st.button(label='生成',key=2,use_container_width=True)
+    with col2:          
+        if gene_srw:
+            N=int(N_value)
+            p=float(p_value)
+            l=int(l_value)
+            G_RW = models.step_RW_graph(N,p,l)
+            pr_RW = dict(nx.degree_centrality(G_RW))
+            pos_RW =nx.spring_layout(G_RW, k=0.4) 
+            nx.draw_networkx_edges(G_RW, pos_RW,edge_color='Gray')
+            nx.draw_networkx_nodes(G_RW, pos_RW,node_color=list(pr_RW.values()), cmap=plt.cm.Reds,node_size=120,edgecolors='Gray')
                 
-        if vis_par and gene_srw:
-            VIS_components.net_parameter(G_RW)    
+
+            plt.axis('off')
+            plt.tight_layout()
+            plt.suptitle(f"N={N} m={p} l={l} step_random_walk")
+            st.pyplot(plt)
+            st.caption("次数が高いほどノードの色が濃く表現") 
+            
+    if vis_par and gene_srw:
+        VIS_components.net_parameter(G_RW)
+    if dig_hist and gene_srw:
+        VIS_hist.visualization_hist(G_RW)
     if G_RW:                
-        VIS_components.downloud_adjacency_list_button(G_RW)                  
+        downloud_adjacency.downloud_adjacency_list_button(G_RW)             
     
 
 

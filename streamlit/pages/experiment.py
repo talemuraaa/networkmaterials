@@ -1,20 +1,14 @@
 import streamlit as st
 from utils import sideber_title
-from pages.experiments import ex_hist
+from pages.experiments.main_attack_net import attack_to_network
 
 
 sideber_title.sideber_title()
-st.title("🚀実験場")
+st.title("🚀動作テスト")
 st.write("""
          ### 🔧工事中🔧
          """)
 
 st.divider()
 
-page = st.sidebar.selectbox(
-    "実験を選択",
-    ("次数分布","最短経路長、クラスター係数")
-    )
-
-if page == "次数分布":
-    ex_hist.experiment_hist()
+attack_to_network()

@@ -2,14 +2,14 @@ import numpy as np
 import streamlit as st
 import networkx as nx
 import matplotlib.pyplot as plt
-from pages.experiments.select_model import model_select
+from pages.network_models.select_model import model_select
 
 def experiment_hist():
-    st.header("ヒストグラム")
+    st.header("次数分布")
     st.write("""
              - 複数のネットワークのヒストグラムを同時に表示します。
              - ネットワークのサイズは各ネットワークで共通です。
-             - パラメータをサイドバーで選択した後、「保存」に☑を入れてください。
+             - パラメータをサイドバーで選択し、☑を入れてください。
              - 用意するネットワークの個数と☑の数が同じ場合にのみヒストグラムが表示されます。
              - 次数分布の縦軸の0が合わない気がする。
              """)
@@ -23,6 +23,7 @@ def experiment_hist():
         G=model_select(network_size,i)
         networks_list.append(G)
         if G:
+            
             degree_sequence=list(nx.degree(G))
             a = max(degree_sequence,key=lambda x:x[1])[1]
             max_deg_list.append(a)
@@ -31,24 +32,21 @@ def experiment_hist():
     
     gene_hist_button=st.button("次数分布を生成",key='gene_hist',type='primary')
     
-    if gene_hist_button and len(networks_list)==network_count:
+    if gene_hist_button :
+        fig, ax = plt.subplots(figsize=(7, 6))
         for i in range(network_count):
-            G=networks_list[i] #生成されたネットワークをリストに格納
-            
-            
-            
+            G=networks_list[i] 
             degree_sequence=list(G.degree())
             hist,bins=np.histogram(degree_sequence,bins,density=True)
-            plt.plot(hist,label=f"network{i}")
+            ax.plot(hist,label=f"network{i}")
             
-        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
         
-        plt.xlabel('degree')
-        plt.grid(True)
-        plt.ylim(bottom=0)
-        st.pyplot(plt)
+        ax.set_xlabel('degree')
+        ax.grid(True)
 
-    
+        st.pyplot(fig)
+
     
     
     
