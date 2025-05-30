@@ -19,14 +19,6 @@ st.write("""
 
 st.divider()
 
-st.header("参考（にしたい）先行研究資料")
-
-st.write("https://www.frontiersin.org/journals/physics/articles/10.3389/fphy.2022.823564/full")
-st.write("https://www.nature.com/articles/s41598-017-07878-2")
-st.write("https://journals.aps.org/pre/abstract/10.1103/PhysRevE.65.056109")
-st.write("https://arxiv.org/pdf/1103.1741")
-
-
 st.header("参考書籍")
 
 st.markdown(
@@ -35,6 +27,10 @@ st.markdown(
         https://www.maruzen-publishing.co.jp/book/b10123080.html
         #### 2. _ゲーム理論からの社会ネットワーク分析_  (申請中)
         https://www.ohmsha.co.jp/book/9784274230899/
+        #### 3. __ネットワーク科学__ (申請中)
+        https://www.kyoritsu-pub.co.jp/book/b10003149.html \n
+        
+        ↑この本、なんとAlbert-László Barabási著。（BAモデルの人）
 
         """
     )
