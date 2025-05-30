@@ -22,7 +22,7 @@ def model_select_ver2(N=None, index=0):
         st.write(f"#### _Network{index}_")
         if N is None:
             N = st.slider(
-                "ノード数 (N)", 0, 3000, 500,
+                "ノード数 (N)", 0, 3000, 500,step=50,
                 key=f"{index}_nodes"
             )
         network = st.selectbox(
@@ -31,7 +31,7 @@ def model_select_ver2(N=None, index=0):
                 "random network",
                 "watts-strogatz model",
                 "Barabasi-Albert model",
-                "random walk",
+                "Holme-Kim model",
                 "ex random walk"
             ],
             key=f"{index}_model"
@@ -39,9 +39,10 @@ def model_select_ver2(N=None, index=0):
 
     # 右カラム: パラメータ設定と生成ボタン
     with col2:
+        
         if network == "random network":
             p = st.slider(
-                "接続確率 p", 0.0, 1.0, 0.1,
+                "接続確率 p", 0.0, 1.0, 0.01,
                 key=f"{index}_p"
             )
             if st.checkbox("生成", key=f"{index}_rand_check"):
@@ -66,8 +67,8 @@ def model_select_ver2(N=None, index=0):
             )
             if st.checkbox("生成", key=f"{index}_ba_check"):
                 return nx.barabasi_albert_graph(N, m)
-
-        elif network == "random walk":
+            
+        elif network == "Holme-Kim model":
             m = st.slider(
                 "接続リンク数 m", 1, 20, 3,
                 key=f"{index}_rw_m"
@@ -77,7 +78,7 @@ def model_select_ver2(N=None, index=0):
                 key=f"{index}_rw_p"
             )
             if st.checkbox("生成", key=f"{index}_rw_check"):
-                return models.random_walk_graph(N, m, p)
+                return nx.powerlaw_cluster_graph(N, m, p)
 
         elif network == "ex random walk":
             p = st.slider(
@@ -154,5 +155,3 @@ def model_select(N,i):
                 if button:
                     G=nerwork_models_cache.exrw_network(N,p,l=None)
                     return G
-    
-                   

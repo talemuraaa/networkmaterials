@@ -1,24 +1,20 @@
 import streamlit as st
 import matplotlib.pylab as plt
+import pandas as pd
 from module.network_models.select_model import model_select_ver2,model_select
-from module.experiments import select_stra
+from module.experiments.attack_strategy import select_stra
+from module.experiments.attack_comp import criterions
 
 #１つのネットワークに対して複数の攻撃戦略を指定して同時に表示する。（ver2）
 
 def multi_attack_to_network():
     
     st.header("ネットワークへのアタック")
-    
+    st.write("ノード数1,000以上は非推奨。計算時間が数分以上かかる場合があります。")
     st.divider()
+
     
-    col1,col2=st.columns([3,2])
-    with col1:
-        st.write("１．アタック対象の設定")
-        N=st.slider("N_value",10,3000,500,step=10)
-    with col2:
-        st.write("")
-    
-    G=model_select_ver2(N,index=0)
+    G=model_select_ver2()
     
     if G:
         st.write("2. 攻撃方法の選択")
@@ -40,15 +36,23 @@ def multi_attack_to_network():
             
         
         fig, ax = plt.subplots(figsize=(7, 6))
-        
+        R={}
         for label, values in result.items():
                 ax.plot(range(len(values)), values, label=label)
+                
+                R[label]=criterions.robustness(values)
 
         ax.grid(True)
         ax.set_xlabel("Number of nodes removed")
         ax.set_ylabel("Percentage of nodes in giant connected component")
-        ax.legend()
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
         st.pyplot(fig)
+        
+        df = pd.DataFrame.from_dict(
+            {"rubstness": R}, orient='index'
+        ).T
+        
+        st.dataframe(df, width=200)
 
 #1つのネットワークに対して１つの攻撃戦略を指定する。（ver1）
 
@@ -87,7 +91,7 @@ def attack_to_network():
         st.pyplot(fig)
 
         
-    
+
     
     
     

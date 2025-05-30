@@ -5,18 +5,26 @@ import numpy as np
 
 #受け取ったネットワークのヒストグラムを表示する。
 
-def visualization_hist(G):
+def visualization_hist(G:nx.graph):
     fig, ax = plt.subplots(figsize=(7, 4))
-    degree_sequence=list(nx.degree(G))
-    max_deg = max(degree_sequence,key=lambda x:x[1])[1]
+    degrees = [degree for _, degree in G.degree()]
+    
+    max_deg = max(degrees)
     bins=range(0, max_deg+5)
     
-    hist,bins=np.histogram(degree_sequence,bins)
+    hist, bins = np.histogram(degrees, bins=bins)
+    #x = bin_edges[:-1]
+    
     ax.plot(hist)
-    ax.set_xlabel('degree')
-    ax.grid(True)
+    
+    #ax.bar(x, hist, width=0.8, edgecolor='black', align='center')
+
+    ax.set_xlabel("Degree")
+    ax.set_ylabel("Frequency")
+    ax.grid(linestyle='--', alpha=0.7)
+
+
     fig.tight_layout()
-    ax.set_ylim(bottom=0)
     st.pyplot(fig)
     
 

@@ -1,7 +1,7 @@
 import networkx as nx
 import random as rd
 
-#自作モデル
+#自作モデル集
 
 def random_walk_graph(N,m,p):
     G=nx.complete_graph(4)
@@ -95,3 +95,32 @@ def step_RW_graph(N,p,l=None):
             G.add_edge(i,s)
             
     return G
+
+#次数に基づき山登りを行い、その軌跡とリンクを接続
+
+def mauntein_graph(N:int):
+    G=nx.complete_graph(4)
+
+    for i in range(4,N):
+        node_list=list(nx.nodes(G))
+        j=rd.choice(node_list)
+        
+        current_node=j
+        path=[current_node]
+        neighbor_list=nx.neighbor_degree(j)
+        
+        #隣接ノードの中で最も次数の高いノードに移動。自分より次数が高いノードがない場合は移動しない。
+        while(nx.degree(current_node) > neighbor_list):
+            next_node=max(neighbor_list)
+            neighbor_list=nx.neighbor_degree(next_node)
+            path.append(next_node)
+            current_node=next_node
+        for k in path:
+            G.add_edge(i,k)   
+        
+    return G
+        
+        
+
+        
+        
