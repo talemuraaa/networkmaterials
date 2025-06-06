@@ -1,7 +1,0 @@
-matplotlib
-networkx
-plotly
-numpy
-pandas
-igraph
-scipy
